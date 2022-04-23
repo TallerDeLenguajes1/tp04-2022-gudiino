@@ -14,7 +14,7 @@ void MostrarUnaTarea(Tarea *ptarea);
 Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas);
 void MostrarTareas(Tarea **listaTareas, int nTareas);
 void LiberacionMemoria(Tarea **lista, int nTareas);
-Tarea *BuscaTarea(Tarea **Lista,  int nTareas, int idTareaBuscar);
+Tarea *BusquedaPorId(Tarea **Lista,  int nTareas, int idTareaBuscar);
 
 
 int main(){
@@ -39,10 +39,10 @@ int main(){
     printf("\n=========================================");
     printf("\nIngrese el numero de tarea a buscar: ");
     scanf("%d", &idTareaBuscar);
-    tareaAbuscar = BuscaTarea(listaTareas, nTareas, idTareaBuscar);
+    tareaAbuscar = BusquedaPorId(listaTareas, nTareas, idTareaBuscar);
     if (tareaAbuscar==NULL)
     {
-       tareaAbuscar=BuscaTarea(TareasRealizadas, nTareas, idTareaBuscar);
+       tareaAbuscar=BusquedaPorId(TareasRealizadas, nTareas, idTareaBuscar);
        if (tareaAbuscar==NULL)
        {
            printf("\nNo se ecnontraron coincidencias.");
@@ -144,7 +144,7 @@ void LiberacionMemoria(Tarea **lista, int nTareas)
     } 
 }
 //desarrollo de punto 5
-Tarea *BuscaTarea(Tarea **Lista, int nTareas, int idTareaBuscar)
+Tarea *BusquedaPorId(Tarea **Lista, int nTareas, int idTareaBuscar)
 {
     int cont=0, tarea=0;
     while (cont < nTareas && tarea == 0)
