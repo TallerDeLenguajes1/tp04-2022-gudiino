@@ -14,11 +14,13 @@ void MostrarUnaTarea(Tarea *ptarea);
 Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas);
 void MostrarTareas(Tarea **listaTareas, int nTareas);
 void LiberacionMemoria(Tarea **lista, int nTareas);
+Tarea *BuscaTarea(Tarea **Lista,  int nTareas, int idTareaBuscar);
 
 
 int main(){
-    int nTareas;
+    int nTareas, idTareaBuscar;
     Tarea **listaTareas, **TareasRealizadas;
+    Tarea *tareaAbuscar;
     printf("\n=========================================");
     printf("\nIngrese la cantidad de tareas a cargar: ");
     scanf("%d", &nTareas);
@@ -29,11 +31,31 @@ int main(){
     TareasRealizadas = (Tarea **)malloc(nTareas*sizeof(Tarea *));
     TareasRealizadas = ControlTareas(TareasRealizadas, listaTareas, nTareas);
     printf("\n=========================================");
+    printf("\nTareas cargadas realizadas");
+    MostrarTareas(TareasRealizadas, nTareas);
+    printf("\n=========================================");
     printf("\nTareas cargadas pendientes");
     MostrarTareas(listaTareas, nTareas);
     printf("\n=========================================");
-    printf("\nTareas cargadas realizadas");
-    MostrarTareas(TareasRealizadas, nTareas);
+    printf("\nIngrese el numero de tarea a buscar: ");
+    scanf("%d", &idTareaBuscar);
+    tareaAbuscar = BuscaTarea(listaTareas, nTareas, idTareaBuscar);
+    if (tareaAbuscar==NULL)
+    {
+       tareaAbuscar=BuscaTarea(TareasRealizadas, nTareas, idTareaBuscar);
+       if (tareaAbuscar==NULL)
+       {
+           printf("\nNo se ecnontraron coincidencias.");
+       }else{
+           printf("\n.....................\n");
+           printf("\nLa tarea buscada se encuenta realizada");
+           MostrarUnaTarea(tareaAbuscar);
+       }
+    }else{
+        printf("\n.....................\n");
+        printf("\nLa tarea buscada se encuenta pendiente");
+        MostrarUnaTarea(tareaAbuscar);
+    } 
     //liberacion de todas las memorias
     LiberacionMemoria(listaTareas, nTareas);
     free(listaTareas);
@@ -51,8 +73,8 @@ void cargarTareas(Tarea **listaTareas, int nTareas)
     {
         printf("\n.....................\n");
         listaTareas[i]=(Tarea *)malloc(sizeof(Tarea));
-        listaTareas[i]->TareaID=i;
-        printf("Tarea numero %d", i+1);
+        listaTareas[i]->TareaID=i+1;
+        printf("Id tarea %d", i+1);
         printf("\nDescripcion: "); 
         fflush(stdin);
         gets(Buff);
@@ -67,10 +89,10 @@ void MostrarUnaTarea(Tarea *pTarea)
 {
     if (pTarea!=NULL)
     {
-        printf("\nTarea numero: %d", pTarea->TareaID+1);
+        printf("\nId tarea: %d", pTarea->TareaID);
         printf("\nDescripcion: ");
         puts(pTarea->Descripcion);
-        printf("Duracion: %d", pTarea->Duracion);
+        printf("Duracion: %d Hs", pTarea->Duracion);
     }else{
         printf("\nNo hay tarea designada");
     }
@@ -91,11 +113,11 @@ Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas
         scanf("%d", &aux);
         if (aux==1)
         {
-            cont++;
-            TareasRealizadas[cont-1] = (Tarea *) malloc(sizeof(Tarea));
-            *TareasRealizadas[cont-1] = *listaTareas[i];
+            TareasRealizadas[cont] = (Tarea *) malloc(sizeof(Tarea));
+            *TareasRealizadas[cont] = *listaTareas[i];
             free(listaTareas[i]);
             listaTareas[i]=NULL;
+            cont++;
         }
     }
     for (int i = cont; i < nTareas; i++)
@@ -104,12 +126,13 @@ Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas
     }
     return TareasRealizadas;
 }
+
 void MostrarTareas(Tarea **listaTareas, int nTareas)
 {
     for (int i = 0; i < nTareas; i++)
     {
         printf("\n.....................\n");
-        printf("Tarea numero %d", i+1);
+        printf("Casilla %d", i+1);
         MostrarUnaTarea(listaTareas[i]);
     }
 }
@@ -119,4 +142,22 @@ void LiberacionMemoria(Tarea **lista, int nTareas)
     {
         free(lista[i]);
     } 
+}
+//desarrollo de punto 5
+Tarea *BuscaTarea(Tarea **Lista, int nTareas, int idTareaBuscar)
+{
+    int cont=0, tarea=0;
+    while (cont < nTareas && tarea == 0)
+    {
+        if (Lista[cont]!= NULL && Lista[cont]->TareaID==idTareaBuscar)
+        {
+            return Lista[cont]; 
+            tarea=1;
+        }     
+        cont++;
+    }
+    if (cont == nTareas && Lista[cont-1]==NULL)
+    {
+        return NULL; 
+    }       
 }
