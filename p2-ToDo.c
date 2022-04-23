@@ -14,11 +14,13 @@ void MostrarUnaTarea(Tarea *ptarea);
 Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas);
 void MostrarTareas(Tarea **listaTareas, int nTareas);
 void LiberacionMemoria(Tarea **lista, int nTareas);
+Tarea *BuscaTarea(Tarea **Lista, int nTareas, char *palabraTareaBuscar);
 
 
 int main(){
     int nTareas;
-    Tarea **listaTareas, **TareasRealizadas;
+    char *palabraTareaBuscar, *Buff;
+    Tarea **listaTareas, **TareasRealizadas, *tareaAbuscar;
     printf("\n=========================================");
     printf("\nIngrese la cantidad de tareas a cargar: ");
     scanf("%d", &nTareas);
@@ -34,6 +36,30 @@ int main(){
     printf("\n=========================================");
     printf("\nTareas cargadas realizadas");
     MostrarTareas(TareasRealizadas, nTareas);
+    printf("\n=========================================");
+    printf("\nIngrese la palabra clave para buscar la de tarea: ");
+    Buff= (char *) malloc(50*sizeof(char));
+    fflush(stdin);
+    gets(Buff);
+    palabraTareaBuscar = (char *) malloc((strlen(Buff)+1)*sizeof(char));
+    strcpy(palabraTareaBuscar,Buff);
+    tareaAbuscar = BuscaTarea(listaTareas, nTareas, palabraTareaBuscar);
+    if (tareaAbuscar==NULL)
+    {
+       tareaAbuscar=BuscaTarea(TareasRealizadas, nTareas, palabraTareaBuscar);
+       if (tareaAbuscar==NULL)
+       {
+           printf("\nNo se ecnontraron coincidencias.");
+       }else{
+           printf("\n.....................\n");
+           printf("\nLa tarea buscada se encuenta realizada");
+           MostrarUnaTarea(tareaAbuscar);
+       }
+    }else{
+        printf("\n.....................\n");
+        printf("\nLa tarea buscada se encuenta pendiente");
+        MostrarUnaTarea(tareaAbuscar);
+    } 
     //liberacion de todas las memorias
     LiberacionMemoria(listaTareas, nTareas);
     free(listaTareas);
@@ -119,4 +145,22 @@ void LiberacionMemoria(Tarea **lista, int nTareas)
     {
         free(lista[i]);
     } 
+}
+
+Tarea *BuscaTarea(Tarea **Lista, int nTareas, char *palabraTareaBuscar)
+{
+    int cont=0, tarea=0;
+    while (cont < nTareas && tarea == 0)
+    {
+        if (Lista[cont]!= NULL && strstr(Lista[cont]->Descripcion, palabraTareaBuscar)!=NULL)//funcion strstr compara de la cad2 esta dentro de la cad1
+        {
+            return Lista[cont]; 
+            tarea=1;
+        }     
+        cont++;
+    }
+    if (cont == nTareas && Lista[cont-1]==NULL)
+    {
+        return NULL; 
+    }       
 }
