@@ -14,7 +14,7 @@ void MostrarUnaTarea(Tarea *ptarea);
 Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas);
 void MostrarTareas(Tarea **listaTareas, int nTareas);
 void LiberacionMemoria(Tarea **lista, int nTareas);
-Tarea *BuscaTarea(Tarea **Lista, int nTareas, char *palabraTareaBuscar);
+Tarea *BuscquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar);
 
 
 int main(){
@@ -43,10 +43,10 @@ int main(){
     gets(Buff);
     palabraTareaBuscar = (char *) malloc((strlen(Buff)+1)*sizeof(char));
     strcpy(palabraTareaBuscar,Buff);
-    tareaAbuscar = BuscaTarea(listaTareas, nTareas, palabraTareaBuscar);
+    tareaAbuscar = BuscquedaPorPalabra(listaTareas, nTareas, palabraTareaBuscar);
     if (tareaAbuscar==NULL)
     {
-       tareaAbuscar=BuscaTarea(TareasRealizadas, nTareas, palabraTareaBuscar);
+       tareaAbuscar=BuscquedaPorPalabra(TareasRealizadas, nTareas, palabraTareaBuscar);
        if (tareaAbuscar==NULL)
        {
            printf("\nNo se ecnontraron coincidencias.");
@@ -147,7 +147,7 @@ void LiberacionMemoria(Tarea **lista, int nTareas)
     } 
 }
 
-Tarea *BuscaTarea(Tarea **Lista, int nTareas, char *palabraTareaBuscar)
+Tarea *BuscquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar)
 {
     int cont=0, tarea=0;
     while (cont < nTareas && tarea == 0)
