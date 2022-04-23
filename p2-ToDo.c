@@ -14,11 +14,11 @@ void MostrarUnaTarea(Tarea *ptarea);
 Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas);
 void MostrarTareas(Tarea **listaTareas, int nTareas);
 void LiberacionMemoria(Tarea **lista, int nTareas);
-Tarea *BuscquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar);
-
+Tarea *BusquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar);
+Tarea *BusquedaPorId(Tarea **Lista,  int nTareas, int idTareaBuscar);
 
 int main(){
-    int nTareas;
+    int nTareas, idTareaBuscar, opBusca;
     char *palabraTareaBuscar, *Buff;
     Tarea **listaTareas, **TareasRealizadas, *tareaAbuscar;
     printf("\n=========================================");
@@ -31,22 +31,46 @@ int main(){
     TareasRealizadas = (Tarea **)malloc(nTareas*sizeof(Tarea *));
     TareasRealizadas = ControlTareas(TareasRealizadas, listaTareas, nTareas);
     printf("\n=========================================");
-    printf("\nTareas cargadas pendientes");
-    MostrarTareas(listaTareas, nTareas);
-    printf("\n=========================================");
     printf("\nTareas cargadas realizadas");
     MostrarTareas(TareasRealizadas, nTareas);
     printf("\n=========================================");
-    printf("\nIngrese la palabra clave para buscar la de tarea: ");
-    Buff= (char *) malloc(50*sizeof(char));
-    fflush(stdin);
-    gets(Buff);
-    palabraTareaBuscar = (char *) malloc((strlen(Buff)+1)*sizeof(char));
-    strcpy(palabraTareaBuscar,Buff);
-    tareaAbuscar = BuscquedaPorPalabra(listaTareas, nTareas, palabraTareaBuscar);
+    printf("\nTareas cargadas pendientes");
+    MostrarTareas(listaTareas, nTareas);
+    printf("\n=========================================");
+    ////////////////////////////////
+    printf("\nIngrese la opcion de busqueda deseada:");
+    printf("\n1 -> Busqueda por palabra clave");
+    printf("\n2 -> Busqueda por Id de tarea");
+    printf("\nSeleccion: ");
+    scanf("%d", &opBusca);
+    if (opBusca==1)
+    {
+        printf("\nIngrese la palabra clave para buscar la de tarea: ");
+        Buff= (char *) malloc(50*sizeof(char));
+        fflush(stdin);
+        gets(Buff);
+        palabraTareaBuscar = (char *) malloc((strlen(Buff)+1)*sizeof(char));
+        strcpy(palabraTareaBuscar,Buff);
+        free(Buff);
+        tareaAbuscar = BusquedaPorPalabra(listaTareas, nTareas, palabraTareaBuscar);
+    }
+    if (opBusca==2)
+    {
+        printf("\nIngrese el numero de tarea a buscar: ");
+        scanf("%d", &idTareaBuscar);
+        tareaAbuscar = BusquedaPorId(listaTareas, nTareas, idTareaBuscar);
+    }
     if (tareaAbuscar==NULL)
     {
-       tareaAbuscar=BuscquedaPorPalabra(TareasRealizadas, nTareas, palabraTareaBuscar);
+        switch (opBusca)
+        {
+        case 1:
+            tareaAbuscar=BusquedaPorPalabra(TareasRealizadas, nTareas, palabraTareaBuscar);
+            break;
+        case 2:
+             tareaAbuscar=BusquedaPorId(TareasRealizadas, nTareas, idTareaBuscar);        
+            break;
+        }
        if (tareaAbuscar==NULL)
        {
            printf("\nNo se ecnontraron coincidencias.");
@@ -77,8 +101,8 @@ void cargarTareas(Tarea **listaTareas, int nTareas)
     {
         printf("\n.....................\n");
         listaTareas[i]=(Tarea *)malloc(sizeof(Tarea));
-        listaTareas[i]->TareaID=i;
-        printf("Tarea numero %d", i+1);
+        listaTareas[i]->TareaID=i+1;
+        printf("Id tarea %d", i+1);
         printf("\nDescripcion: "); 
         fflush(stdin);
         gets(Buff);
@@ -93,10 +117,10 @@ void MostrarUnaTarea(Tarea *pTarea)
 {
     if (pTarea!=NULL)
     {
-        printf("\nTarea numero: %d", pTarea->TareaID+1);
+        printf("\nId tarea: %d", pTarea->TareaID);
         printf("\nDescripcion: ");
         puts(pTarea->Descripcion);
-        printf("Duracion: %d", pTarea->Duracion);
+        printf("Duracion: %d Hs", pTarea->Duracion);
     }else{
         printf("\nNo hay tarea designada");
     }
@@ -117,11 +141,11 @@ Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas
         scanf("%d", &aux);
         if (aux==1)
         {
-            cont++;
-            TareasRealizadas[cont-1] = (Tarea *) malloc(sizeof(Tarea));
-            *TareasRealizadas[cont-1] = *listaTareas[i];
+            TareasRealizadas[cont] = (Tarea *) malloc(sizeof(Tarea));
+            *TareasRealizadas[cont] = *listaTareas[i];
             free(listaTareas[i]);
             listaTareas[i]=NULL;
+            cont++;
         }
     }
     for (int i = cont; i < nTareas; i++)
@@ -130,12 +154,13 @@ Tarea **ControlTareas(Tarea **TareasRealizadas, Tarea **listaTareas, int nTareas
     }
     return TareasRealizadas;
 }
+
 void MostrarTareas(Tarea **listaTareas, int nTareas)
 {
     for (int i = 0; i < nTareas; i++)
     {
         printf("\n.....................\n");
-        printf("Tarea numero %d", i+1);
+        printf("Casilla %d", i+1);
         MostrarUnaTarea(listaTareas[i]);
     }
 }
@@ -147,12 +172,31 @@ void LiberacionMemoria(Tarea **lista, int nTareas)
     } 
 }
 
-Tarea *BuscquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar)
+Tarea *BusquedaPorPalabra(Tarea **Lista, int nTareas, char *palabraTareaBuscar)
 {
     int cont=0, tarea=0;
     while (cont < nTareas && tarea == 0)
     {
         if (Lista[cont]!= NULL && strstr(Lista[cont]->Descripcion, palabraTareaBuscar)!=NULL)//funcion strstr compara de la cad2 esta dentro de la cad1
+        {
+            return Lista[cont]; 
+            tarea=1;
+        }     
+        cont++;
+    }
+    if (cont == nTareas && Lista[cont-1]==NULL)
+    {
+        return NULL; 
+    }
+
+}
+
+Tarea *BusquedaPorId(Tarea **Lista, int nTareas, int idTareaBuscar)
+{
+    int cont=0, tarea=0;
+    while (cont < nTareas && tarea == 0)
+    {
+        if (Lista[cont]!= NULL && Lista[cont]->TareaID==idTareaBuscar)
         {
             return Lista[cont]; 
             tarea=1;
