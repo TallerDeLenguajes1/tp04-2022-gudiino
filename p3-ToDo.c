@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -15,7 +16,7 @@ struct TNODO{
     struct TNODO *siguiente;
 }typedef Lista;
 Lista *crearLista();
-Lista *InsertarTarea(Lista *ListaX, Tarea *NuevaTarea);
+Lista *InsertarTarea(Lista *ListaX, Tarea *NuevaTarea); 
 Lista *cargarTareas(Lista *ListaX, int nTareas);
 Lista *ControlTareas(Lista *TareasRealizadas, Lista *listaTareas);
 void MostrarUnaTarea(Tarea *pTarea);
@@ -32,8 +33,9 @@ int main(){
     Tarea *tareaAbuscar;
     printf("\n=========================================");
     ListaTareas=crearLista();
-    printf("\nIngrese la cantidad de tareas a cargar: ");
-    scanf("%d", &nTareas);
+    printf("\nIngrese la cantidad de tareas a cargar: 4");
+    //scanf("%d", &nTareas);
+    nTareas=4;
     // listaTareas = (Tarea **)malloc(nTareas*sizeof(Tarea *));
     ListaTareas = cargarTareas(ListaTareas, nTareas);
     printf("\n=========================================");
@@ -54,7 +56,7 @@ int main(){
     scanf("%d", &opBusca);
     if (opBusca==1)
     {
-        printf("\nIngrese la palabra clave para buscar la de tarea: ");
+        printf("\nIngrese la palabra clave para buscar la tarea: ");
         Buff= (char *) malloc(50*sizeof(char));
         fflush(stdin);
         gets(Buff);
@@ -102,7 +104,8 @@ int main(){
    {
        TareasRealizadas=borrarPrimerElemento(TareasRealizadas);
    }
-   
+    printf("\nFIN");
+    sleep(5);
     return 0;
 }
 //*************************************************************************
@@ -136,14 +139,32 @@ Lista *cargarTareas(Lista *ListaX, int nTareas)
     {
         printf("\n.....................\n");
         nuevo->TareaID=i+1;
-        printf("Id tarea %d", i+1);
-        printf("\nDescripcion: "); 
-        fflush(stdin);
-        gets(Buff);
+        printf("Id tarea: %d", i+1);
+        //printf("\nDescripcion: "); 
+        //fflush(stdin);
+        //gets(Buff);
+        //*********************carga de datos para prueba
+        switch (i)
+        {
+        case 0:
+            strcpy(Buff,"tarea uno");
+            break;
+        case 1:
+            strcpy(Buff,"tarea dos");
+            break;
+        case 2:
+            strcpy(Buff,"tarea tres");
+            break;
+        case 3:
+            strcpy(Buff,"tarea cuatro");
+            break;
+        }
+        //******************
         nuevo->Descripcion=(char *)malloc((strlen(Buff)+1)*sizeof(char));
         strcpy(nuevo->Descripcion, Buff);
+        printf("\nDescripcion: %s", nuevo->Descripcion);//agreagado para prueba
         nuevo->Duracion = rand()%90+10;
-        printf("Duracion: %d", nuevo->Duracion);
+        printf("\nDuracion: %d Hs", nuevo->Duracion);
         ListaX=InsertarTarea(ListaX,nuevo);
     }
     free(Buff);
@@ -156,16 +177,19 @@ Lista *ControlTareas(Lista *TareasRealizadas, Lista *listaTareas)
     int aux;
     Lista *pTarea;
     pTarea=listaTareas;
+    srand(time(NULL));
     printf("\n\nIndique si realizo la siguientes tareas");
-    while (pTarea!=NULL)
+    while (pTarea)
     {
         printf("\n.....................");
         MostrarUnaTarea(pTarea->dato);
         printf("\n¿Se realizo la tarea?");
         printf("\n1 -> SI");
         printf("\n2 -> NO");
-        printf("\nSeleccion: ");
-        scanf("%d", &aux);
+        //scanf("%d", &aux);
+        //*********************para prueba
+        aux=rand()%2+1;
+        printf("\nSeleccion: %d", aux);
         if (aux==1)
         {
             TareasRealizadas = InsertarTarea(TareasRealizadas, pTarea->dato);
@@ -180,7 +204,7 @@ Lista *ControlTareas(Lista *TareasRealizadas, Lista *listaTareas)
 
 void MostrarUnaTarea(Tarea *pTarea)
 {
-    if (pTarea!=NULL)
+    if (pTarea)
     {
         printf("\nId tarea: %d", pTarea->TareaID);
         printf("\nDescripcion: ");
@@ -193,9 +217,9 @@ void MostrarUnaTarea(Tarea *pTarea)
 
 void MostrarTareas(Lista *listaTareas)
 {
-    if (listaTareas!=NULL)
+    if (listaTareas)
     {
-        while (listaTareas!=NULL)
+        while (listaTareas)
         {
             printf("\n.....................\n");
             MostrarUnaTarea(listaTareas->dato);
@@ -213,9 +237,9 @@ Lista *BorrarTareaX(Lista *listaX, Tarea *tareaRealizada)
     bool aux=false;
     pActual=listaX;
     pAnterior = NULL;
-    if (pActual!=NULL)
+    if (pActual)
     {
-        while (pActual!=NULL&& !aux)
+        while (pActual && !aux)
         {
             if (pActual->dato->TareaID==tareaRealizada->TareaID)
             {
@@ -223,10 +247,10 @@ Lista *BorrarTareaX(Lista *listaX, Tarea *tareaRealizada)
                 if (pAnterior==NULL)
                 {
                     listaX=pActual->siguiente;
-                    free(pActual);              
+                    //free(pActual);              
                 }else{
                     pAnterior->siguiente=pActual->siguiente;
-                    free(pActual);
+                    //free(pActual);
                 }               
             }else{
                 pAnterior=pActual;
@@ -238,50 +262,42 @@ Lista *BorrarTareaX(Lista *listaX, Tarea *tareaRealizada)
 }
 
 Tarea *BusquedaPorPalabra(Lista *ListaX, char *palabraTareaBuscar){
-    int tarea=0;
-    Lista *pTarea;
-    pTarea=ListaX;
-    while (pTarea!=NULL && tarea == 0)
+    Lista *pTarea=ListaX;
+    while (pTarea && !strstr(pTarea->dato->Descripcion, palabraTareaBuscar) )//strstr devuelve un apúntador NULL si no hay concidencia y apuntador a valor si los hay
     {
-        if (pTarea!= NULL && strstr(pTarea->dato->Descripcion, palabraTareaBuscar)!=NULL)//funcion strstr compara de la cad2 esta dentro de la cad1
-        {
-            return pTarea->dato; 
-            tarea=1;
-        }
         pTarea=pTarea->siguiente;
     }
     if (pTarea==NULL)
     {
-        return NULL; 
+        return NULL;
+    }else{
+        return pTarea->dato; 
     }
 }
 
 Tarea *BusquedaPorId(Lista *ListaX, int idTareaBuscar)
 {
-    int tarea=0;
-    Lista *pTarea;
-    pTarea=ListaX;
-    while (pTarea!=NULL && tarea == 0)
+    Lista *pTarea=ListaX;
+    while (pTarea && pTarea->dato->TareaID!=idTareaBuscar)
     {
-        if (pTarea!= NULL && pTarea->dato->TareaID==idTareaBuscar)
-        {
-            return pTarea->dato; 
-            tarea=1;
-        }
         pTarea=pTarea->siguiente;
     }
     if (pTarea==NULL)
     {
-        return NULL; 
-    }       
+        return NULL;
+    }else{
+        return pTarea->dato;
+    }      
 }
 
 Lista *borrarPrimerElemento(Lista *ListaX)
 {
-    if(ListaX != NULL){
+    if(ListaX){
         Lista *borrar;
         borrar = ListaX;
         ListaX = ListaX->siguiente;
-        free(borrar);//pendiente de correccion
+        free(borrar->dato->Descripcion);
+        free(borrar);
     }
+    return ListaX;
 }
